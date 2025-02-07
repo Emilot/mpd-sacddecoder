@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2023 The Music Player Daemon Project
+ * Copyright (C) 2003-2025 The Music Player Daemon Project
  * http://www.musicpd.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ static constexpr Domain dvdaiso_domain("dvdaiso");
 
 namespace dvdaiso {
 
-constexpr const char* DVDA_TRACKXXX_FMT{ "AUDIO_TS__TRACK%03u%c.%3s" };
+constexpr auto DVDA_TRACKXXX_FMT{ "AUDIO_TS__TRACK%03u%c.%3s" };
 constexpr double SHORT_TRACK_SEC{ 2.0 };
 
 bool        param_no_downmixes;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2023 The Music Player Daemon Project
+ * Copyright (C) 2003-2025 The Music Player Daemon Project
  * http://www.musicpd.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ static constexpr Domain sacdiso_domain("sacdiso");
 
 namespace sacdiso {
 
-constexpr const char* SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+constexpr auto SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 
 unsigned    param_dstdec_threads;
 bool        param_edited_master;
@@ -222,9 +222,11 @@ container_scan(Path path_fs) {
 		for (auto track = 0u; track < mulch_count; track++) {
 			AddTagHandler handler(tag_builder);
 			scan_info(track, track + twoch_count, handler);
+			char track_name[64];
+			std::sprintf(track_name, SACD_TRACKXXX_FMT, 'M', track + 1, suffix);
 			tail = list.emplace_after(
 				tail,
-				fmt::format(SACD_TRACKXXX_FMT, 'M', track + 1, suffix),
+				track_name,
 				tag_builder.Commit()
 			);
 		}

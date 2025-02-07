@@ -61,7 +61,6 @@ constinit const struct DecoderPlugin *const decoder_plugins[] = {
 	&opus_decoder_plugin,
 #endif
 #ifdef ENABLE_DSD
-	&dsdiff_decoder_plugin,
 	&dsf_decoder_plugin,
 #endif
 #ifdef ENABLE_FAAD

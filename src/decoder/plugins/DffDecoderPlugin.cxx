@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2023 The Music Player Daemon Project
+ * Copyright (C) 2003-2025 The Music Player Daemon Project
  * http://www.musicpd.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ static constexpr Domain dsdiff_domain("dsdiff");
 
 namespace dsdiff {
 
-constexpr const char* DSDIFF_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+constexpr auto DSDIFF_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 
 unsigned  param_dstdec_threads;
 bool      param_edited_master;
