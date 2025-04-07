@@ -18,6 +18,8 @@
 
 #include "mlp_util.h"
 
+void abort(void);
+
 void av_freep(void* arg);
 void* ff_realloc_static(void* ptr, unsigned int size);
 
@@ -488,6 +490,8 @@ void* ff_realloc_static(void* ptr, unsigned int size) {
 /*****************************************************************************/
 /***   mlpdsp.c                                                            ***/
 /*****************************************************************************/
+
+void ff_mlp_init(DSPContext* c, AVCodecContext *avctx);
 
 void dsputil_init(DSPContext* p, AVCodecContext *avctx) {
 	 ff_mlp_init(p, avctx);
