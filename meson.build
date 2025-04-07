@@ -1,16 +1,16 @@
 project(
   'mpd',
   ['c', 'cpp'],
-  version: '0.24',
-  meson_version: '>= 1.0',
+  version: '0.25',
+  meson_version: '>= 1.2',
   default_options: [
     'c_std=c11',
     'build.c_std=c11',
-    'cpp_std=c++20',
-    'build.cpp_std=c++20',
+    'cpp_std=c++23',
+    'build.cpp_std=c++23',
     'warning_level=3',
 
-    'fmt:cpp_std=c++20',
+    'fmt:cpp_std=c++23',
 
     # If we build those libraries as Meson subproject, they shall be
     # linked statically into the MPD executable.
@@ -24,6 +24,7 @@ project(
     'libmicrohttpd:default_library=static',
     'libmpdclient:default_library=static',
     'libnpupnp:default_library=static',
+    'libsndfile:default_library=static',
     'liburing:default_library=static',
     'ogg:default_library=static',
     'openssl:default_library=static',
@@ -46,6 +47,7 @@ project(
     'lame:warning_level=0',
     'libmicrohttpd:warning_level=0',
     'libnpupnp:warning_level=0',
+    'libsndfile:warning_level=0',
     'liburing:warning_level=0',
     'sqlite3:warning_level=0',
     'ogg:werror=false',
@@ -88,6 +90,10 @@ project(
     'lame:tools=disabled',
     'libmpdclient:documentation=false',
     'libmpdclient:test=false',
+    'libsndfile:external_libs=disabled',
+    'libsndfile:mpeg=disabled',
+    'libsndfile:programs=false',
+    'libsndfile:sndio=disabled',
     'openssl:build_cli=false',
     'openssl:asm=disabled',
     'opus:docs=disabled',
@@ -112,7 +118,7 @@ version_conf = configuration_data()
 version_conf.set_quoted('PACKAGE', meson.project_name())
 version_conf.set_quoted('PACKAGE_NAME', meson.project_name())
 version_conf.set_quoted('VERSION', meson.project_version())
-version_conf.set_quoted('PROTOCOL_VERSION', '0.24.0')
+version_conf.set_quoted('PROTOCOL_VERSION', '0.25.0')
 configure_file(output: 'Version.h', configuration: version_conf)
 
 conf = configuration_data()
@@ -170,6 +176,8 @@ test_cxxflags = test_common_flags + [
   '-Wsuggest-override',
   '-Wvolatile',
   '-Wvirtual-inheritance',
+
+  '-Wno-missing-field-initializers',
 
   # a vtable without a dtor is just fine
   '-Wno-non-virtual-dtor',
@@ -285,13 +293,7 @@ conf.set('ENABLE_DAEMON', enable_daemon)
 conf.set('HAVE_GETPWNAM_R', compiler.has_function('getpwnam_r'))
 conf.set('HAVE_INITGROUPS', compiler.has_function('initgroups'))
 conf.set('HAVE_FNMATCH', compiler.has_function('fnmatch'))
-
-# Explicitly exclude Windows in this check because
-# https://github.com/mesonbuild/meson/issues/3672 (reported in 2018,
-# still not fixed in 2020) causes Meson to believe it exists, because
-# __builtin_strndup() exists (but strndup() still cannot be used).
-conf.set('HAVE_STRNDUP', not is_windows and compiler.has_function('strndup', prefix: '#define _GNU_SOURCE\n#include <string.h>'))
-
+conf.set('HAVE_STRNDUP', compiler.has_function('strndup', prefix: '#define _GNU_SOURCE\n#include <string.h>'))
 conf.set('HAVE_STRCASESTR', compiler.has_function('strcasestr'))
 
 conf.set('HAVE_PRCTL', is_linux)
@@ -458,12 +460,6 @@ if is_windows
   ]
 endif
 
-if is_darwin
-  sources += [
-    'src/apple/AppleMain.cxx',
-  ]
-endif
-
 if not is_android
   sources += [
     'src/CommandLine.cxx',
@@ -499,6 +495,7 @@ subdir('src/fs')
 subdir('src/io')
 subdir('src/io/uring')
 subdir('src/system')
+subdir('src/system/linux')
 subdir('src/thread')
 subdir('src/net')
 subdir('src/event')

@@ -3,6 +3,11 @@ on:
   workflow_dispatch:
   push:
     paths-ignore:
+      - 'AUTHORS'
+      - 'COPYING'
+      - 'LICENSES/**'
+      - 'NEWS'
+      - 'README.md'
       - 'android/**'
       - 'build/**'
       - 'doc/**'
@@ -12,9 +17,14 @@ on:
       - 'win32/**'
     branches:
       - master
-      - v0.23.x
+      - v0.24.x
   pull_request:
     paths-ignore:
+      - 'AUTHORS'
+      - 'COPYING'
+      - 'LICENSES/**'
+      - 'NEWS'
+      - 'README.md'
       - 'android/**'
       - 'build/**'
       - 'doc/**'
@@ -24,7 +34,7 @@ on:
       - 'win32/**'
     branches:
       - master
-      - v0.23.x
+      - v0.24.x
 
 permissions:
   contents: read #  to fetch code (actions/checkout)
@@ -104,7 +114,7 @@ jobs:
       - id: cache-ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ matrix.compiler }}
+          key: ${{ matrix.os }}-${{ matrix.compiler }}
 
       - name: Configure
         run: |
@@ -121,7 +131,7 @@ jobs:
         run: meson compile -C output/full --verbose
 
       - name: Unit Tests
-        run: meson test -C output/full
+        run: meson test -C output/full --print-errorlogs
 
       - name: Configure Mini
         run: |
@@ -148,7 +158,7 @@ jobs:
         run: meson compile -C output/mini --verbose
 
       - name: Unit Tests Mini
-        run: meson test -C output/mini
+        run: meson test -C output/mini --print-errorlogs
 
   build-macos:
     strategy:
@@ -203,7 +213,7 @@ jobs:
       - id: cache-ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ matrix.compiler }}
+          key: ${{ matrix.os }}-${{ matrix.compiler }}
 
       - name: Configure
         run: |
@@ -219,7 +229,7 @@ jobs:
         run: meson compile -C output/full --verbose
 
       - name: Unit Tests
-        run: meson test -C output/full
+        run: meson test -C output/full --print-errorlogs
 
       - name: Configure Mini
         run: |
@@ -246,7 +256,7 @@ jobs:
         run: meson compile -C output/mini --verbose
 
       - name: Unit Tests Mini
-        run: meson test -C output/mini
+        run: meson test -C output/mini --print-errorlogs
 
   build-msys2:
     strategy:
@@ -265,6 +275,7 @@ jobs:
           msystem: ${{matrix.platform}}
           pacboy: >-
             cc:p
+            ccache:p
             cmake:p
             dbus:p
             faad2:p
@@ -291,7 +302,34 @@ jobs:
             twolame:p
             yajl:p
 
-      - name: Compile and Test
+      - id: cache-ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.platform }}
+
+      - name: Configure
         run: |
-          meson setup "${{github.workspace}}/build" -Dbzip2=disabled -Dcdio_paranoia=disabled -Dchromaprint=disabled -Ddocumentation=disabled -Dfluidsynth=disabled -Dicu=disabled -Diso9660=disabled -Dmikmod=disabled -Dmpg123=disabled -Dnfs=disabled -Dsidplay=disabled -Dudisks=disabled -Dupnp=disabled -Dwavpack=disabled -Dzzip=disabled -Dtest=true -Dwarning_level=3
-          meson compile -C "${{github.workspace}}/build" --verbose
+          meson setup \
+            -Dbzip2=disabled \
+            -Dcdio_paranoia=disabled \
+            -Dchromaprint=disabled \
+            -Ddocumentation=disabled \
+            -Dfluidsynth=disabled \
+            -Dicu=disabled \
+            -Diso9660=disabled \
+            -Dmikmod=disabled \
+            -Dmpg123=disabled \
+            -Dnfs=disabled \
+            -Dsidplay=disabled \
+            -Dudisks=disabled \
+            -Dupnp=disabled \
+            -Dwavpack=disabled \
+            -Dzzip=disabled \
+            -Dtest=true \
+            "${{github.workspace}}/build"
+
+      - name: Build
+        run: meson compile -C "${{github.workspace}}/build" --verbose
+
+      - name: Unit Tests
+        run: meson test -C "${{github.workspace}}/build" --print-errorlogs

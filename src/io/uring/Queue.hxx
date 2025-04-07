@@ -101,8 +101,16 @@ public:
 		while (WaitDispatchOneCompletion()) {}
 	}
 
+	bool SubmitAndWaitDispatchCompletions(struct __kernel_timespec *timeout);
+
 private:
+	static void _DispatchOneCompletion(const struct io_uring_cqe &cqe) noexcept;
 	void DispatchOneCompletion(struct io_uring_cqe &cqe) noexcept;
+
+	/**
+	 * Dispatch all completions using io_uring_for_each_cqe().
+	 */
+	unsigned DispatchCompletions(struct io_uring_cqe &cqe) noexcept;
 };
 
 } // namespace Uring

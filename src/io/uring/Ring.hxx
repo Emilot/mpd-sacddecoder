@@ -102,6 +102,16 @@ public:
 	struct io_uring_cqe *WaitCompletion();
 
 	/**
+	 * Submit requests and wait for one completion (or a timeout).
+	 * Wrapper for io_uring_submit_and_wait_timeout().
+	 *
+	 * Throws on error.
+	 *
+	 * @return a completion queue entry or nullptr on EAGAIN/ETIME
+	 */
+	struct io_uring_cqe *SubmitAndWaitCompletion(struct __kernel_timespec *timeout);
+
+	/**
 	 * Peek one completion (non-blocking).
 	 *
 	 * Throws on error.
@@ -115,6 +125,35 @@ public:
 	 */
 	void SeenCompletion(struct io_uring_cqe &cqe) noexcept {
 		io_uring_cqe_seen(&ring, &cqe);
+	}
+
+	/**
+	 * Invoke a function with a reference to each completion (but
+	 * do not mark it "seen" or advance the completion queue
+	 * head).
+	 */
+	unsigned ForEachCompletion(struct io_uring_cqe *cqe,
+				   std::invocable<struct io_uring_cqe &> auto f) noexcept {
+		unsigned dummy, n = 0;
+
+		io_uring_for_each_cqe(&ring, dummy, cqe) {
+			++n;
+			f(*cqe);
+		}
+
+		return n;
+	}
+
+	/**
+	 * Like ForEachCompletion(), but advance the completion queue
+	 * head.
+	 */
+	unsigned VisitCompletions(struct io_uring_cqe *cqe,
+				  std::invocable<const struct io_uring_cqe &> auto f) noexcept {
+		unsigned n = ForEachCompletion(cqe, f);
+		if (n > 0)
+			io_uring_cq_advance(&ring, n);
+		return n;
 	}
 };
 

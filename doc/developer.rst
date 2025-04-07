@@ -12,7 +12,7 @@ Code Style
 * indent with tabs (width 8)
 * don't write CPP when you can write C++: use inline functions and constexpr instead of macros
 * comment your code, document your APIs
-* the code should be C++20 compliant, and must compile with :program:`GCC` 12 and :program:`clang` 14
+* the code should be C++23 compliant, and must compile with :program:`GCC` 12 and :program:`clang` 14
 * all code must be exception-safe
 * classes and functions names use CamelCase; variables are lower-case with words separated by underscore
 
@@ -69,11 +69,11 @@ There are two active branches in the git repository:
 
 - the "unstable" branch called ``master`` where new features are
   merged.  This will become the next major release eventually.
-- the "stable" branch (currently called ``v0.22.x``) where only bug
+- the "stable" branch (currently called ``v0.24.x``) where only bug
   fixes are merged.
 
-Once :program:`MPD` 0.23 is released, a new branch called ``v0.23.x``
-will be created for 0.23 bug-fix releases; after that, ``v0.22.x``
+Once :program:`MPD` 0.25 is released, a new branch called ``v0.25.x``
+will be created for 0.25 bug-fix releases; after that, ``v0.24.x``
 will eventually cease to be maintained.
 
 After bug fixes have been added to the "stable" branch, it will be

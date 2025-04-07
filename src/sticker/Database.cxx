@@ -12,9 +12,11 @@
 
 #include <fmt/format.h>
 #include <cassert>
+#include <exception> // for std::throw_with_nested()
 #include <iterator>
 #include <array>
 #include <stdexcept>
+#include <utility> // for std::unreachable()
 
 using namespace Sqlite;
 
@@ -441,8 +443,7 @@ StickerDatabase::BindFind(const char *type, const char *base_uri,
 		return sql;
 	}
 
-	assert(false);
-	gcc_unreachable();
+	std::unreachable();
 }
 
 void

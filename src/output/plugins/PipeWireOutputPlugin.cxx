@@ -24,8 +24,6 @@
 #pragma GCC diagnostic push
 /* oh no, libspa likes to cast away "const"! */
 #pragma GCC diagnostic ignored "-Wcast-qual"
-/* suppress more annoying warnings */
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
 #include <pipewire/pipewire.h>
@@ -111,6 +109,12 @@ class PipeWireOutput final : AudioOutput {
 	 */
 	uint_least8_t dsd_interleave;
 #endif
+
+	/**
+	 * Configuration setting for #PW_STREAM_FLAG_DONT_RECONNECT
+	 * (negated).
+	 */
+	const bool reconnect_stream;
 
 	bool disconnected;
 
@@ -290,10 +294,11 @@ PipeWireOutput::PipeWireOutput(const ConfigBlock &block)
 	:AudioOutput(FLAG_ENABLE_DISABLE),
 	 name(block.GetBlockValue("name", "pipewire")),
 	 remote(block.GetBlockValue("remote", nullptr)),
-	 target(block.GetBlockValue("target", nullptr))
+	 target(block.GetBlockValue("target", nullptr)),
 #if defined(ENABLE_DSD) && defined(SPA_AUDIO_DSD_FLAG_NONE)
-	, enable_dsd(block.GetBlockValue("dsd", false))
+	 enable_dsd(block.GetBlockValue("dsd", false)),
 #endif
+	 reconnect_stream(block.GetBlockValue("reconnect_stream", true))
 {
 	if (target != nullptr) {
 		if (StringIsEmpty(target))
@@ -507,11 +512,7 @@ PipeWireOutput::Open(AudioFormat &audio_format)
 
 	if (target != nullptr && target_id == PW_ID_ANY)
 		pw_properties_setf(props,
-#if PW_CHECK_VERSION(0, 3, 64)
 				   PW_KEY_TARGET_OBJECT,
-#else
-				   PW_KEY_NODE_TARGET,
-#endif
 				   "%s", target);
 
 #ifdef PW_KEY_NODE_RATE
@@ -586,14 +587,19 @@ PipeWireOutput::Open(AudioFormat &audio_format)
 						       SPA_PARAM_EnumFormat,
 						       &raw);
 
+	unsigned stream_flags = PW_STREAM_FLAG_AUTOCONNECT |
+		PW_STREAM_FLAG_INACTIVE |
+		PW_STREAM_FLAG_MAP_BUFFERS |
+		PW_STREAM_FLAG_RT_PROCESS;
+
+	if (!reconnect_stream)
+		stream_flags |= PW_STREAM_FLAG_DONT_RECONNECT;
+
 	int error =
 		pw_stream_connect(stream,
 				  PW_DIRECTION_OUTPUT,
 				  target_id,
-				  (enum pw_stream_flags)(PW_STREAM_FLAG_AUTOCONNECT |
-							 PW_STREAM_FLAG_INACTIVE |
-							 PW_STREAM_FLAG_MAP_BUFFERS |
-							 PW_STREAM_FLAG_RT_PROCESS),
+				  static_cast<enum pw_stream_flags>(stream_flags),
 				  params, 1);
 	if (error < 0)
 		throw PipeWire::MakeError(error, "Failed to connect stream");
@@ -613,7 +619,7 @@ PipeWireOutput::Close() noexcept
 
 inline void
 PipeWireOutput::StateChanged(enum pw_stream_state state,
-			     [[maybe_unused]] const char *error) noexcept
+			     const char *error) noexcept
 {
 	const bool was_disconnected = disconnected;
 	disconnected = state == PW_STREAM_STATE_ERROR ||
