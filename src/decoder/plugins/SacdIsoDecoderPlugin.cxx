@@ -50,10 +50,14 @@ static constexpr Domain sacdiso_domain("sacdiso");
 namespace sacdiso {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 constexpr auto SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 =======
 constexpr const char* SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 >>>>>>> c174ce022 (Merge)
+=======
+constexpr auto SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+>>>>>>> ece43c38f (Merge)
 
 unsigned    param_dstdec_threads;
 bool        param_edited_master;
@@ -227,6 +231,7 @@ container_scan(Path path_fs) {
 			AddTagHandler handler(tag_builder);
 			scan_info(track, track + twoch_count, handler);
 <<<<<<< HEAD
+<<<<<<< HEAD
 			char track_name[64];
 			std::sprintf(track_name, SACD_TRACKXXX_FMT, 'M', track + 1, suffix);
 			tail = list.emplace_after(
@@ -237,6 +242,13 @@ container_scan(Path path_fs) {
 				tail,
 				fmt::format(SACD_TRACKXXX_FMT, 'M', track + 1, suffix),
 >>>>>>> c174ce022 (Merge)
+=======
+			char track_name[64];
+			std::sprintf(track_name, SACD_TRACKXXX_FMT, 'M', track + 1, suffix);
+			tail = list.emplace_after(
+				tail,
+				track_name,
+>>>>>>> ece43c38f (Merge)
 				tag_builder.Commit()
 			);
 		}

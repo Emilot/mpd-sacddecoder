@@ -49,10 +49,14 @@ static constexpr Domain dsdiff_domain("dsdiff");
 namespace dsdiff {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 constexpr auto DSDIFF_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 =======
 constexpr const char* DSDIFF_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
 >>>>>>> c174ce022 (Merge)
+=======
+constexpr auto DSDIFF_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+>>>>>>> ece43c38f (Merge)
 
 unsigned  param_dstdec_threads;
 bool      param_edited_master;
