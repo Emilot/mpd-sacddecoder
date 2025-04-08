@@ -51,7 +51,11 @@ static constexpr Domain dvdaiso_domain("dvdaiso");
 
 namespace dvdaiso {
 
+<<<<<<< HEAD
 constexpr auto DVDA_TRACKXXX_FMT{ "AUDIO_TS__TRACK%03u%c.%3s" };
+=======
+constexpr const char* DVDA_TRACKXXX_FMT{ "AUDIO_TS__TRACK%03u%c.%3s" };
+>>>>>>> c174ce022 (Merge)
 constexpr double SHORT_TRACK_SEC{ 2.0 };
 
 bool        param_no_downmixes;

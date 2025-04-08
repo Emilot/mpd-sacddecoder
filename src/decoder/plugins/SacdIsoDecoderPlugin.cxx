@@ -49,7 +49,11 @@ static constexpr Domain sacdiso_domain("sacdiso");
 
 namespace sacdiso {
 
+<<<<<<< HEAD
 constexpr auto SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+=======
+constexpr const char* SACD_TRACKXXX_FMT{ "%cC_AUDIO__TRACK%03u.%3s" };
+>>>>>>> c174ce022 (Merge)
 
 unsigned    param_dstdec_threads;
 bool        param_edited_master;
@@ -222,11 +226,17 @@ container_scan(Path path_fs) {
 		for (auto track = 0u; track < mulch_count; track++) {
 			AddTagHandler handler(tag_builder);
 			scan_info(track, track + twoch_count, handler);
+<<<<<<< HEAD
 			char track_name[64];
 			std::sprintf(track_name, SACD_TRACKXXX_FMT, 'M', track + 1, suffix);
 			tail = list.emplace_after(
 				tail,
 				track_name,
+=======
+			tail = list.emplace_after(
+				tail,
+				fmt::format(SACD_TRACKXXX_FMT, 'M', track + 1, suffix),
+>>>>>>> c174ce022 (Merge)
 				tag_builder.Commit()
 			);
 		}
