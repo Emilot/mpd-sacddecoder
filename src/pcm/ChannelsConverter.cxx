@@ -49,13 +49,13 @@ PcmChannelsConverter::Convert(std::span<const std::byte> src) noexcept
 	switch (format) {
 	case SampleFormat::UNDEFINED:
 	case SampleFormat::S8:
-		gcc_unreachable();
+		std::unreachable();
 
 	case SampleFormat::DSD:
 #ifdef ENABLE_DSD
 		return pcm_convert_channels_dsd(buffer, dest_channels, src_channels, src);
 #else
-		gcc_unreachable();
+		std::unreachable();
 #endif
 
 	case SampleFormat::S16:
